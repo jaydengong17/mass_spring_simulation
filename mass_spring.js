@@ -1,3 +1,7 @@
+// to use this code, you must be inside HTML canvas (below part),
+// and have inputs for the layers and sides / width and heigh,
+// layer seperation, and stiffness of the springs
+
 const canvas = document.getElementById("canvas");
 const ctx = document.getElementById("canvas").getContext("2d");
   
@@ -8,9 +12,9 @@ let springs = [];
 let objects = [];
 
 const node_radius = 5;
-const damping_factor = 0.9;
-const gravity = 9.8;
-const delta_time = 0.05;
+const damping_factor = 0.99;
+const gravity = 10;
+const delta_time = 0.01;
 
 class Node{
     constructor(x, y){
@@ -132,7 +136,6 @@ class Body{
 
         for (let n = 0; n < node_pos.length; n++){
             let positions = node_pos[n];
-            //console.log(this.x_bounds, this.y_bounds, positions);
             this.body_nodes.push(new Node(...positions));
             nodes.push(this.body_nodes[this.body_nodes.length - 1])
 
@@ -208,7 +211,9 @@ function clearPressed(){
     while (objects.length > 0) objects.pop();
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    startPressed();
+    if (Loop != null){
+      startPressed();
+    }
 }
 
 
@@ -252,6 +257,8 @@ function fillPolygon(layers, sides, layer_seperation, stiffness){
     if (layers === false || sides === false){
         layers = document.getElementById("radius").value;
         sides = document.getElementById("sides").value;
+        layer_seperation = document.getElementById("seperation").value;
+        stiffness = document.getElementById("stiffness").value;
     }
     
     let last_layer_index = nodes.length;
@@ -318,10 +325,11 @@ function makeBox(box_width, box_height, unit_width, stiffness){
     if (box_width === false || box_height === false){
         box_width = document.getElementById("x-size").value;
         box_height = document.getElementById("y-size").value;
+        layer_seperation = document.getElementById("seperation").value;
+        stiffness = document.getElementById("stiffness").value;
     }
 
     index = nodes.length;
-    stiffness = 100;
     let new_body_nodes = [];
     for(let row = 0; row < box_height; row++){
         for(let col = 0; col < box_width; col++){
@@ -422,7 +430,6 @@ function setObject(body){
                            (canvas.height, rectifiedMousePos.y + bounds.y[1])
                            - bounds.y[1]);
     
-    // body.move({x: 250, y: 250});
     body.move(rectifiedMousePos);
 
     if (ismouseDown){
@@ -432,7 +439,6 @@ function setObject(body){
     }
 }
 
-// useless right now becasue of the mouse thing
 function waitUntilUp(param){
     if (!ismouseDown) {
         clearInterval(waitingInterval);
